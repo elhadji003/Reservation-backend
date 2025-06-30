@@ -45,6 +45,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', '921910398dhdhfdjfwuieweundmdiw')
 # === Cors ===
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "https://reservation-frontend-psi.vercel.app"
 ]
 
 ALLOWED_HOSTS = ['*']
