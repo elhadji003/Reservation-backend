@@ -2,7 +2,9 @@ services:
   - type: web
     name: mon-backend-django
     env: python
-    buildCommand: pip install -r requirements.txt
+    buildCommand: |
+      pip install -r requirements.txt
+      python manage.py collectstatic --noinput
     startCommand: gunicorn Backend.wsgi:application
     envVars:
       - key: DJANGO_SETTINGS_MODULE
@@ -11,6 +13,3 @@ services:
         generateValue: true
       - key: DEBUG
         value: False
-    buildCommand: |
-      pip install -r requirements.txt
-      python manage.py collectstatic --noinput
