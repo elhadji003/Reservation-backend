@@ -50,7 +50,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
             'role': user.role,
             'username': user.username,
             'phone': user.phone,
-            'avatar': user.avatar.url if user.avatar else None  # ✅ safe pour JSON
+            # 'avatar': user.avatar.url if user.avatar else None  # ✅ safe pour JSON
         }
 
         return data

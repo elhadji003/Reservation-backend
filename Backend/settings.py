@@ -15,6 +15,10 @@ from datetime import timedelta
 import os
 import dotenv
 import dj_database_url
+import cloudinary
+import dotenv
+dotenv.load_dotenv()
+
 
 
 
@@ -30,9 +34,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-z1u)x_p#p4_-p=axq#u9ni-kg_cewf$&9#2ka)*560$jl50^at'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
+DEBUG = True
 # DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 't')
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
+# DEBUG = os.getenv('DEBUG', 'False') == 'True'
 SECRET_KEY = os.getenv('SECRET_KEY', '921910398dhdhfdjfwuieweundmdiw')
 
 
@@ -73,11 +77,11 @@ INSTALLED_APPS = [
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
-    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
-    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
-}
+cloudinary.config(
+    cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME', 'dfnmodvks'),
+    api_key=os.getenv('CLOUDINARY_API_KEY', '458753634813941'),
+    api_secret=os.getenv('CLOUDINARY_API_SECRET', 'Ofvbl75tk-mNedLGp4XHr4Ax77M'),
+)
 
 # === Google Calendar ===
 GOOGLE_SERVICE_ACCOUNT_FILE = os.path.join(BASE_DIR, 'secrets', 'calendar-service.json')
