@@ -30,9 +30,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-z1u)x_p#p4_-p=axq#u9ni-kg_cewf$&9#2ka)*560$jl50^at'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG = True
+# DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 't')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 SECRET_KEY = os.getenv('SECRET_KEY', '921910398dhdhfdjfwuieweundmdiw')
-ALLOWED_HOSTS = ['*']
 
 
 
@@ -202,3 +203,18 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = "malickelhadji07@gmail.com"
 EMAIL_HOST_PASSWORD = "dbwl lzfj bvxe bhrs"  # Ne pas utiliser ton mot de passe normal
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+import json
+import tempfile
+
+GOOGLE_SERVICE_ACCOUNT_JSON = os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON')
+
+if GOOGLE_SERVICE_ACCOUNT_JSON:
+    # Crée un fichier temporaire avec le contenu JSON
+    temp_path = os.path.join(tempfile.gettempdir(), 'calendar-service.json')
+    with open(temp_path, 'w') as f:
+        f.write(GOOGLE_SERVICE_ACCOUNT_JSON)
+    GOOGLE_SERVICE_ACCOUNT_FILE = temp_path
+else:
+    GOOGLE_SERVICE_ACCOUNT_FILE = None
