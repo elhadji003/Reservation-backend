@@ -13,3 +13,9 @@ services:
         generateValue: true
       - key: DEBUG
         value: False
+      - key: CLOUDINARY_CLOUD_NAME
+        value: dfnmodvks
+      - key: CLOUDINARY_API_KEY
+        value: "458753634813941"
+      - key: CLOUDINARY_API_SECRET
+        value: "Ofvbl75tk-mNedLGp4XHr4Ax77M"

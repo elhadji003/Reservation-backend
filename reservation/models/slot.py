@@ -1,3 +1,4 @@
+from cloudinary.models import CloudinaryField
 from django.db import models
 from .resource import Resource
 
@@ -10,9 +11,10 @@ class Slot(models.Model):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     map = models.CharField(max_length=100)
-    image1 = models.ImageField(upload_to='slots/', blank=True, null=True)
-    image2 = models.ImageField(upload_to='slots/', blank=True, null=True)
-    image3 = models.ImageField(upload_to='slots/', blank=True, null=True)
+    
+    image1 = CloudinaryField('image', blank=True, null=True)
+    image2 = CloudinaryField('image', blank=True, null=True)
+    image3 = CloudinaryField('image', blank=True, null=True)
 
     class Meta:
         unique_together = ("resource", "start_time", "end_time")
