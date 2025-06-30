@@ -63,11 +63,21 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'django_filters',
     'import_export',
+    'cloudinary',
+    'cloudinary_storage',
 
     # app
     'users',
     'reservation',
 ]
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
+}
 
 # === Google Calendar ===
 GOOGLE_SERVICE_ACCOUNT_FILE = os.path.join(BASE_DIR, 'secrets', 'calendar-service.json')
