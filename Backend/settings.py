@@ -220,16 +220,28 @@ EMAIL_HOST_PASSWORD = "dbwl lzfj bvxe bhrs"  # Ne pas utiliser ton mot de passe 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
-import json
+import os
 import tempfile
+import json
 
+# Récupère la variable d'environnement qui contient la clé JSON (avec \n échappés)
 GOOGLE_SERVICE_ACCOUNT_JSON = os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON')
 
+GOOGLE_SERVICE_ACCOUNT_FILE = None
+
 if GOOGLE_SERVICE_ACCOUNT_JSON:
-    # Crée un fichier temporaire avec le contenu JSON
+    # Transforme la chaîne JSON en dictionnaire Python
+    data = json.loads(GOOGLE_SERVICE_ACCOUNT_JSON)
+    
+    # Corrige la clé privée en remplaçant les séquences échappées '\\n' par de vrais retours à la ligne '\n'
+    data['private_key'] = data['private_key'].replace('\\n', '\n')
+    
+    # Écris ce JSON corrigé dans un fichier temporaire
     temp_path = os.path.join(tempfile.gettempdir(), 'calendar-service.json')
     with open(temp_path, 'w') as f:
-        f.write(GOOGLE_SERVICE_ACCOUNT_JSON)
+        json.dump(data, f, indent=2)
+    
     GOOGLE_SERVICE_ACCOUNT_FILE = temp_path
-else:
-    GOOGLE_SERVICE_ACCOUNT_FILE = None
+
+# Maintenant tu peux utiliser GOOGLE_SERVICE_ACCOUNT_FILE dans ta config Google API
+print("Chemin du fichier JSON Google Service Account :", GOOGLE_SERVICE_ACCOUNT_FILE)
