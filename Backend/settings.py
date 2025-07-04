@@ -225,25 +225,34 @@ import os
 import tempfile
 import json
 
-# Récupère la variable d'environnement qui contient la clé JSON (avec \n échappés)
+# Récupère la variable d'environnement
 GOOGLE_SERVICE_ACCOUNT_JSON = os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON')
 
-GOOGLE_SERVICE_ACCOUNT_FILE = None
-
 if GOOGLE_SERVICE_ACCOUNT_JSON:
-    # Transforme la chaîne JSON en dictionnaire Python
-    data = json.loads(GOOGLE_SERVICE_ACCOUNT_JSON)
+    try:
+        # Parse le JSON
+        data = json.loads(GOOGLE_SERVICE_ACCOUNT_JSON)
+        
+        # Correction CRITIQUE : remplacer '\\n' par '\n' ET supprimer les éventuels espaces
+        private_key = data['private_key'].replace('\\n', '\n').strip()
+        
+        # Validation du format PEM
+        if not private_key.startswith('-----BEGIN PRIVATE KEY-----') or not private_key.endswith('-----END PRIVATE KEY-----'):
+            raise ValueError("Format PEM invalide pour la clé privée")
+        
+        data['private_key'] = private_key
+        
+        # Crée un fichier temporaire
+        temp_path = os.path.join(tempfile.gettempdir(), 'google-service-account.json')
+        with open(temp_path, 'w') as f:
+            json.dump(data, f)
+        
+        print(f"Fichier de credentials créé avec succès : {temp_path}")
+        GOOGLE_SERVICE_ACCOUNT_FILE = temp_path
     
-    # Corrige la clé privée en remplaçant les séquences échappées '\\n' par de vrais retours à la ligne '\n'
-    data['private_key'] = data['private_key'].replace('\\n', '\n')
-    
-    # Écris ce JSON corrigé dans un fichier temporaire
-    temp_path = os.path.join(tempfile.gettempdir(), 'calendar-service.json')
-    with open(temp_path, 'w') as f:
-        json.dump(data, f, indent=2)
-    
-    GOOGLE_SERVICE_ACCOUNT_FILE = temp_path
-
-# Maintenant tu peux utiliser GOOGLE_SERVICE_ACCOUNT_FILE dans ta config Google API
-print("Chemin du fichier JSON Google Service Account :", GOOGLE_SERVICE_ACCOUNT_FILE)
+    except Exception as e:
+        print(f"ERREUR lors du traitement des credentials : {str(e)}")
+        GOOGLE_SERVICE_ACCOUNT_FILE = None
+else:
+    GOOGLE_SERVICE_ACCOUNT_FILE = None
 
