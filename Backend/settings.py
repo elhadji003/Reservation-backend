@@ -220,7 +220,6 @@ EMAIL_HOST_PASSWORD = "dbwl lzfj bvxe bhrs"  # Ne pas utiliser ton mot de passe 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
-
 import os
 import tempfile
 import json
