@@ -220,38 +220,3 @@ EMAIL_HOST_PASSWORD = "dbwl lzfj bvxe bhrs"  # Ne pas utiliser ton mot de passe 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
-import os
-import tempfile
-import json
-
-# Récupère la variable d'environnement
-GOOGLE_SERVICE_ACCOUNT_JSON = os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON')
-
-if GOOGLE_SERVICE_ACCOUNT_JSON:
-    try:
-        # Parse le JSON
-        data = json.loads(GOOGLE_SERVICE_ACCOUNT_JSON)
-        
-        # Correction CRITIQUE : remplacer '\\n' par '\n' ET supprimer les éventuels espaces
-        private_key = data['private_key'].replace('\\n', '\n').strip()
-        
-        # Validation du format PEM
-        if not private_key.startswith('-----BEGIN PRIVATE KEY-----') or not private_key.endswith('-----END PRIVATE KEY-----'):
-            raise ValueError("Format PEM invalide pour la clé privée")
-        
-        data['private_key'] = private_key
-        
-        # Crée un fichier temporaire
-        temp_path = os.path.join(tempfile.gettempdir(), 'google-service-account.json')
-        with open(temp_path, 'w') as f:
-            json.dump(data, f)
-        
-        # print(f"Fichier de credentials créé avec succès : {temp_path}")
-        GOOGLE_SERVICE_ACCOUNT_FILE = temp_path
-    
-    except Exception as e:
-        print(f"ERREUR lors du traitement des credentials : {str(e)}")
-        GOOGLE_SERVICE_ACCOUNT_FILE = None
-else:
-    GOOGLE_SERVICE_ACCOUNT_FILE = None
-
