@@ -6,6 +6,24 @@ from rest_framework.permissions import IsAuthenticated
 from reservation.serializers.serializers import ReservationCreateSerializer, ReservationDetailSerializer
 from reservation.utils.email import send_reservation_confirmation_email
 
+
+class ReservationAllView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+
+        if user.is_staff:
+            # Admin : voit les réservations liées à SES slots
+            reservations = Reservation.objects.filter(slot__user=user).select_related("slot", "user")
+        else:
+            # Client : voit ses propres réservations
+            reservations = Reservation.objects.filter(user=user).select_related("slot", "user")
+
+        serializer = ReservationDetailSerializer(reservations, many=True)
+        return Response(serializer.data)
+
+
 class ReservationCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -66,8 +84,15 @@ class ReservationCancelView(APIView):
             reservation = Reservation.objects.get(pk=pk, user=request.user)
         except Reservation.DoesNotExist:
             return Response({"error": "Réservation introuvable"}, status=status.HTTP_404_NOT_FOUND)
+
+        slot = reservation.slot
+        slot.is_booked = False
+        slot.save()
+
+        # Annule la réservation
         reservation.status = "cancelled"
         reservation.save()
+
         return Response({"message": "Réservation annulée"}, status=status.HTTP_200_OK)
 
 class ReservationDeleteView(APIView):

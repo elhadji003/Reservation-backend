@@ -49,15 +49,22 @@ class ReservationCreateSerializer(serializers.Serializer):
 
 class ReservationDetailSerializer(serializers.ModelSerializer):
     slot = serializers.SerializerMethodField()
+    user = serializers.SerializerMethodField()
 
     class Meta:
         model = Reservation
-        fields = ['id', 'slot', 'calendar_link', 'status']
+        fields = ['id', 'slot', 'calendar_link', 'status', 'user']
 
     def get_slot(self, obj):
         return {
             "title": obj.slot.title,
             "start_time": obj.slot.start_time,
             "end_time": obj.slot.end_time,
+            "date": obj.slot.date if hasattr(obj.slot, 'date') else None,
         }
-    
+
+    def get_user(self, obj):
+        return {
+            "username": obj.user.username,
+            "email": obj.user.email,
+        }

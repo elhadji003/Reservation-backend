@@ -1,27 +1,23 @@
-
 from rest_framework import serializers
-from ..models import Slot
-from rest_framework.fields import DateTimeField
+from ..models import Slot, Facility
+from .facility import FacilitySerializer
 
 class SlotSerializer(serializers.ModelSerializer):
-    start_time = DateTimeField(format="%Y-%m-%d %H:%M", required=False)
-    end_time = DateTimeField(format="%Y-%m-%d %H:%M", required=False)
-    image1 = serializers.SerializerMethodField()
-    image2 = serializers.SerializerMethodField()
-    image3 = serializers.SerializerMethodField()
+    facilities = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Facility.objects.all()
+    )
+    facilities_details = FacilitySerializer(source="facilities", many=True, read_only=True)
+
+    image1 = serializers.ImageField(required=False, allow_null=True)
+    image2 = serializers.ImageField(required=False, allow_null=True)
+    image3 = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:
         model = Slot
         fields = [
             "id", "title", "is_booked", "category", "rating",
-            "start_time", "end_time", "map", "image1", "image2", "image3", "resource"
+            "start_time", "end_time", "map",
+            "image1", "image2", "image3",
+            "facilities", "facilities_details", "resource"
         ]
-
-    def get_image1(self, obj):
-        return obj.image1.url if obj.image1 else None
-
-    def get_image2(self, obj):
-        return obj.image2.url if obj.image2 else None
-
-    def get_image3(self, obj):
-        return obj.image3.url if obj.image3 else None
+        read_only_fields = ["user"]

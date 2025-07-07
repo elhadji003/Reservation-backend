@@ -247,7 +247,7 @@ if GOOGLE_SERVICE_ACCOUNT_JSON:
         with open(temp_path, 'w') as f:
             json.dump(data, f)
         
-        print(f"Fichier de credentials créé avec succès : {temp_path}")
+        # print(f"Fichier de credentials créé avec succès : {temp_path}")
         GOOGLE_SERVICE_ACCOUNT_FILE = temp_path
     
     except Exception as e:
