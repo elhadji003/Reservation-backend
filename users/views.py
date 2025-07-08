@@ -8,7 +8,10 @@ from django.contrib.auth import logout
 from .serializers import RegisterSerializer, MyTokenObtainPairSerializer
 from .password_serializers import PasswordChangeSerializer
 from .user_serializers import UserProfileSerializer
-
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.core.mail import send_mail
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 
 
 User = get_user_model()
@@ -73,3 +76,44 @@ class PasswordChangeView(generics.UpdateAPIView):
             return Response({"detail": "Mot de passe modifié avec succès."}, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class RequestPasswordResetView(APIView):
+    def post(self, request):
+        email = request.data.get("email")
+        try:
+            user = User.objects.get(email=email)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = PasswordResetTokenGenerator().make_token(user)
+
+            reset_link = f"https://reservation-frontend-psi.vercel.app/reset-password/{uid}/{token}"
+
+            # 💌 Envoi de l'email
+            send_mail(
+                "Réinitialisation du mot de passe",
+                f"Cliquez sur ce lien pour réinitialiser votre mot de passe : {reset_link}",
+                "noreply@tonapp.com",
+                [user.email],
+            )
+
+            return Response({"message": "Email de réinitialisation envoyé."})
+        except User.DoesNotExist:
+            return Response({"error": "Utilisateur non trouvé."}, status=status.HTTP_404_NOT_FOUND)
+
+
+class PasswordResetConfirmView(APIView):
+    def post(self, request, uidb64, token):
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=uid)
+
+            if not PasswordResetTokenGenerator().check_token(user, token):
+                return Response({"error": "Lien invalide ou expiré"}, status=status.HTTP_400_BAD_REQUEST)
+
+            new_password = request.data.get("password")
+            user.set_password(new_password)
+            user.save()
+
+            return Response({"message": "Mot de passe réinitialisé avec succès"})
+        except Exception as e:
+            return Response({"error": "Erreur lors de la réinitialisation"}, status=status.HTTP_400_BAD_REQUEST)
