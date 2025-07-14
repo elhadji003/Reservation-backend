@@ -1,4 +1,4 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from reservation.models import Slot, Facility
 from reservation.serializers.slot import SlotSerializer, FacilitySerializer
