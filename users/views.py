@@ -100,7 +100,6 @@ class RequestPasswordResetView(APIView):
         except User.DoesNotExist:
             return Response({"error": "Utilisateur non trouvé."}, status=status.HTTP_404_NOT_FOUND)
 
-
 class PasswordResetConfirmView(APIView):
     def post(self, request, uidb64, token):
         try:
@@ -110,10 +109,16 @@ class PasswordResetConfirmView(APIView):
             if not PasswordResetTokenGenerator().check_token(user, token):
                 return Response({"error": "Lien invalide ou expiré"}, status=status.HTTP_400_BAD_REQUEST)
 
-            new_password = request.data.get("password")
+            new_password = request.data.get("new_password")
+            re_new_password = request.data.get("re_new_password")
+
+            if new_password != re_new_password:
+                return Response({"error": "Les mots de passe ne correspondent pas."}, status=status.HTTP_400_BAD_REQUEST)
+
             user.set_password(new_password)
             user.save()
 
             return Response({"message": "Mot de passe réinitialisé avec succès"})
         except Exception as e:
+            print("Erreur reset password:", e)
             return Response({"error": "Erreur lors de la réinitialisation"}, status=status.HTTP_400_BAD_REQUEST)
